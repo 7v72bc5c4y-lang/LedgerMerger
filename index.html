@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LedgerMerger: merge PayPal, Venmo, Square and Cash App CSVs</title>
+<meta name="description" content="Merge PayPal, Venmo, Square and Cash App transaction exports into one clean CSV. Runs entirely in your browser; nothing is uploaded.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%BE%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#fafaf9;--card:#fff;--ink:#1c1917;--mute:#78716c;--line:#e7e5e4;--acc:#1c1917;--accink:#fff;--pos:#047857;--neg:#be123c;--soft:#f5f5f4;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171412;--card:#211d1a;--ink:#f5f5f4;--mute:#a8a29e;--line:#36302c;--acc:#f5f5f4;--accink:#1c1917;--pos:#34d399;--neg:#fb7185;--soft:#2a2521;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171412;--card:#211d1a;--ink:#f5f5f4;--mute:#a8a29e;--line:#36302c;--acc:#f5f5f4;--accink:#1c1917;--pos:#34d399;--neg:#fb7185;--soft:#2a2521;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+h1{margin:0;font-size:28px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:4px 0 0}
+.top{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-end;margin-bottom:20px}
+.pill{font-size:12px;font-weight:600;color:var(--pos);border:1px solid var(--pos);border-radius:99px;padding:6px 12px}
+.drop{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:36px 16px;border:2px dashed var(--line);border-radius:16px;background:var(--card);cursor:pointer}
+.drop.on,.drop:hover,.drop:focus-within{border-color:var(--ink)}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.drop b{font-size:16px}.drop span{color:var(--mute);font-size:13px}
+.d{display:none}@media (min-width:760px){.d{display:inline}.m{display:none}}
+.files{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+.files li{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 6px 6px 12px;font-size:13px;max-width:100%}
+.files li.err{border-color:var(--neg);color:var(--neg)}
+.files .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;font-weight:600}
+.files small{display:block;color:var(--mute)}.files .err small{color:var(--neg)}
+button{font:inherit;color:inherit;cursor:pointer}
+.x{border:0;background:none;width:36px;height:36px;border-radius:8px;font-size:18px}.x:hover{background:var(--soft)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+@media (min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.stat p{margin:0;color:var(--mute);font-size:12px}.stat strong{display:block;font-size:22px;margin-top:2px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.bar{display:flex;flex-wrap:wrap;gap:10px;padding:12px;border-bottom:1px solid var(--line)}
+.bar input{flex:1 1 220px;height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px;background:var(--bg);color:var(--ink)}
+.go{height:44px;border:0;border-radius:10px;padding:0 18px;background:var(--acc);color:var(--accink);font-weight:600}
+.go:disabled{opacity:.35;cursor:not-allowed}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid var(--line)}
+.tabs button{flex:none;height:38px;border:0;border-radius:99px;padding:0 14px;background:var(--soft);font-weight:600;font-size:13px}
+.tabs button[aria-selected=true]{background:var(--acc);color:var(--accink)}
+.tabs i{font-style:normal;opacity:.6;margin-left:4px}
+.empty{padding:48px 16px;text-align:center;color:var(--mute)}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.list .who{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list .l{min-width:0}.list .r{text-align:right;flex:none}
+.sm{font-size:12px;color:var(--mute)}
+.tag{font-size:11px;font-weight:700;background:var(--soft);border-radius:5px;padding:1px 6px;color:var(--ink)}
+.tw{display:none;max-height:520px;overflow:auto}
+@media (min-width:760px){.tw{display:block}.list{display:none}}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{position:sticky;top:0;background:var(--soft);text-align:left;color:var(--mute);font-weight:600;padding:8px 12px;white-space:nowrap}
+td{padding:8px 12px;border-top:1px solid var(--line);white-space:nowrap;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.n{text-align:right}
+.pg{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:13px;color:var(--mute)}
+.pg button{width:44px;height:44px;border:0;border-radius:10px;background:none;font-size:20px}.pg button:hover:not(:disabled){background:var(--soft)}.pg button:disabled{opacity:.3}
+.note{color:var(--mute);font-size:12px;margin-top:14px}
+.help{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.help summary{cursor:pointer;min-height:44px;display:flex;align-items:center;padding:0 14px;font-weight:600;font-size:14px}
+.hg{display:grid;gap:18px;padding:14px;border-top:1px solid var(--line)}
+@media (min-width:760px){.hg{grid-template-columns:1fr 1fr}}
+.hg h3{margin:0 0 6px;font-size:13px}.hg ol{margin:0;padding-left:20px;font-size:13px;color:var(--mute)}.hg li{margin:3px 0}.hg p{margin:6px 0 0;font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+  <div><h1>LedgerMerger</h1><p class="sub">Combine PayPal, Venmo, Square and Cash App exports into one clean CSV.</p></div>
+  <span class="pill">Files stay in your browser. Nothing is uploaded.</span>
+</div>
+
+<label class="drop" id="drop">
+  <input type="file" id="pick" multiple accept=".csv,text/csv,text/comma-separated-values,application/vnd.ms-excel">
+  <b><span class="m" style="color:inherit;font-size:inherit">Tap to choose CSV files</span><span class="d" style="color:inherit;font-size:inherit">Drop CSV files here, or click to browse</span></b>
+  <span>Select several at once. The platform is detected automatically.</span>
+</label>
+<details class="help"><summary>Where do I find my CSV file?</summary><div class="hg">
+<section><h3><span class="tag">PayPal</span></h3><ol><li>Sign in at paypal.com on a computer.</li><li>Click Activity, then All Reports. (Older layout: Activity, then Statements, then Custom.)</li><li>Choose Activity download or a custom statement, set the transaction type to All transactions, pick your date range, and set the format to CSV.</li><li>Click Create Report, then Download once it’s ready.</li></ol><p>A report covers up to 12 months at a time. Large ones can take a while, and PayPal may email you when they’re ready.</p></section>
+<section><h3><span class="tag">Venmo</span></h3><ol><li>Sign in at venmo.com on a computer.</li><li>Click Statements in the left sidebar.</li><li>Pick a month and year from the drop-down.</li><li>Click Download CSV.</li></ol><p>Venmo exports one month at a time, going back about three years. Download each month you need, then add all the files here together.</p></section>
+<section><h3><span class="tag">Square</span></h3><ol><li>Sign in to your Square Dashboard on a computer.</li><li>Click Transactions and choose your date range.</li><li>Click Export and pick the Transactions CSV (one row per sale).</li></ol><p>Skip the Items and item-details exports because they don’t include fees. Deposits and Square Card activity are separate exports.</p></section>
+<section><h3><span class="tag">Cash App</span></h3><ol><li>Sign in at cash.app/account in a computer browser.</li><li>Open Activity or Statements.</li><li>Choose Export CSV (or Download) and pick CSV, not PDF.</li></ol><p>The phone app only offers PDF statements, so use a browser. Cash App may email you the file.</p></section>
+<p style="grid-column:1/-1">Menus change from time to time, so names may differ slightly. Save every file you download, then add them all here at once.</p>
+</div></details>
+<ul class="files" id="files"></ul>
+
+<section class="stats" id="stats"></section>
+
+<section class="panel">
+  <div class="bar">
+    <input type="search" id="q" placeholder="Search name, note or amount" aria-label="Search">
+    <button class="go" id="exp" disabled>Export master CSV</button>
+  </div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div id="body"></div>
+</section>
+<p class="note" id="msg" role="status"></p>
+<p class="note">No account, cookies, analytics or network requests. Your files are read in this browser tab and never leave your device.</p>
+</main>
+
+<script>
+(function(){
+var Papa={
+  parse:function(text){
+    var rows=[],row=[],cell='',q=false,i,ch;
+    for(i=0;i<text.length;i++){ch=text[i];
+      if(q){if(ch==='"'){if(text[i+1]==='"'){cell+='"';i++}else q=false}else cell+=ch}
+      else if(ch==='"')q=true;
+      else if(ch===','){row.push(cell);cell=''}
+      else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);cell='';rows.push(row);row=[]}
+      else cell+=ch;
+    }
+    if(cell!==''||row.length){row.push(cell);rows.push(row)}
+    return{data:rows.filter(function(r){return r.some(function(c){return c.trim()!==''})})};
+  },
+  unparse:function(o){
+    var esc=function(v){v=String(v);return/[",\r\n]/.test(v)||/^\s|\s$/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+    return[o.fields].concat(o.data).map(function(r){return r.map(esc).join(',')}).join('\r\n');
+  }
+};
+var PLATFORMS=['PayPal','Venmo','Square','Cash App'], PAGE=25;
+var norm=function(s){return String(s).toLowerCase().replace(/[^a-z0-9]/g,'')};
+var r2=function(n){return Math.round((n+Number.EPSILON)*100)/100};
+var p2=function(n){return String(n).padStart(2,'0')};
+
+function money(v){
+  if(v==null)return 0; var s=String(v).trim(); if(!s)return 0;
+  var neg=/^\(.*\)$/.test(s)||/[-\u2212\u2013]/.test(s);
+  var n=parseFloat(s.replace(/[^0-9.]/g,''));
+  return isFinite(n)?r2(neg?-n:n)+0:0;
+}
+function pdate(input){
+  var s=(input||'').trim(); if(!s)return null;
+  var y=0,mo=0,d=0,rest='',m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})(.*)/);
+  if(m){y=+m[1];mo=+m[2];d=+m[3];rest=m[4];}
+  else if((m=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})(.*)/))){mo=+m[1];d=+m[2];y=+m[3];rest=m[4];if(y<100)y+=2000;}
+  else if(/^[A-Za-z]{3,9}\.? \d{1,2},? \d{4}/.test(s)){var dt=new Date(s);if(isNaN(+dt))return null;y=dt.getFullYear();mo=dt.getMonth()+1;d=dt.getDate();rest=s.replace(/^[A-Za-z]{3,9}\.? \d{1,2},? \d{4}/,'');}
+  else return null;
+  var t=rest.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i),h=t?+t[1]:0,mi=t?+t[2]:0,se=t&&t[3]?+t[3]:0;
+  if(t&&t[4])h=(h%12)+(t[4].toUpperCase()==='PM'?12:0);
+  if(mo<1||mo>12||d<1||d>31||h>23)return null;
+  return y+'-'+p2(mo)+'-'+p2(d)+' '+p2(h)+':'+p2(mi)+':'+p2(se);
+}
+function findCol(headers,aliases){
+  var hs=headers.map(function(h){return[h,norm(h)]}),i,n,hit;
+  for(i=0;i<aliases.length;i++){n=norm(aliases[i]);hit=hs.find(function(x){return x[1]===n});if(hit)return hit[0];}
+  for(i=0;i<aliases.length;i++){n=norm(aliases[i]);if(n.length<3)continue;hit=hs.find(function(x){return x[1].indexOf(n)>-1});if(hit)return hit[0];}
+}
+function getter(headers){
+  var cache={};
+  return function(row){
+    var al=[].slice.call(arguments,1),k=al.join('|');
+    if(!(k in cache))cache[k]=findCol(headers,al);
+    var c=cache[k];return c===undefined?'':String(row[c]==null?'':row[c]).trim();
+  };
+}
+var inactive=function(s){return /denied|fail|cancel|void|expired|declin/i.test(s)};
+function build(pl,date,payer,gross,fee,type,note){
+  if(!date||(gross===0&&fee===0))return null;
+  var f=-Math.abs(fee)+0;
+  return{Date:date,Platform:pl,Payer_Payee:payer.trim(),Gross_Amount:gross,Fee:f,Net_Amount:r2(gross+f),Type:type.trim(),Note_Description:note.trim()};
+}
+function each(rows,fn){var out=[];rows.forEach(function(r){var t=fn(r);if(t)out.push(t)});return out}
+
+var BRAND=/^(visa|master ?card|american express|amex|discover|diners(?: club)?|jcb|union ?pay|interac|eftpos)(?:\s+(?:card|credit|debit))?(?:\s*(?:\*+|x+|ending in\s*)?\d{0,4})?$/i;
+function squarePayer(name,brand){if(name&&!BRAND.test(name))return name;var b=brand||name;return b?'Square Customer ('+b+')':'Square Customer';}
+var PARSERS=[
+{platform:'PayPal',sig:['gross','fee','net','balanceimpact','fromemailaddress','toemailaddress','amountusd','name','transactionid'],
+ parse:function(rows,h){var g=getter(h);return each(rows,function(r){
+  var imp=g(r,'Balance Impact');if(/memo/i.test(imp)||inactive(g(r,'Status')))return null;
+  var gross=money(g(r,'Gross','Amount (USD)','Amount'));if(/debit/i.test(imp)&&gross>0)gross=-gross;
+  return build('PayPal',pdate(g(r,'Date')+' '+g(r,'Time')),g(r,'Name')||g(r,'To Email Address')||g(r,'From Email Address'),gross,money(g(r,'Fee')),g(r,'Type','Description'),g(r,'Subject')||g(r,'Note')||g(r,'Item Title'));});}},
+{platform:'Venmo',sig:['datetime','amounttotal','amountfee','amounttip','fundingsource','destination','from','to'],
+ parse:function(rows,h){var g=getter(h);return each(rows,function(r){
+  if(inactive(g(r,'Status')))return null;
+  var gross=money(g(r,'Amount (total)','Amount')),from=g(r,'From'),to=g(r,'To');
+  var payer=(gross>=0?from:to)||g(r,'Destination')||from||to||'Venmo';
+  return build('Venmo',pdate(g(r,'Datetime','Date')),payer,gross,money(g(r,'Amount (fee)','Fee')),g(r,'Type'),g(r,'Note'));});}},
+{platform:'Square',sig:['paymentid','devicename','totalcollected','grosssales','netsales','nettotal','fees','cardbrand','eventtype'],
+ parse:function(rows,h){var g=getter(h);return each(rows,function(r){
+  return build('Square',pdate(g(r,'Date')+' '+g(r,'Time')),squarePayer(g(r,'Customer Name'),g(r,'Card Brand')),money(g(r,'Total Collected','Gross Sales','Gross','Amount')),money(g(r,'Fees','Fee','Processing Fee')),g(r,'Event Type','Transaction Type','Category'),g(r,'Description')||g(r,'Item')||g(r,'Notes')||g(r,'Details'));});}},
+{platform:'Cash App',sig:['transactiontype','netamount','nameofsenderreceiver','assettype','assetprice','transactionid','fee','notes','status','currency'],
+ parse:function(rows,h){var g=getter(h);return each(rows,function(r){
+  if(inactive(g(r,'Status')))return null;
+  return build('Cash App',pdate(g(r,'Date')),g(r,'Name of sender/receiver','Name')||g(r,'Account')||'Cash App',money(g(r,'Amount','Gross')),money(g(r,'Fee')),g(r,'Transaction Type','Type'),g(r,'Notes','Note'));});}}
+];
+function detect(headers){
+  var set={};headers.forEach(function(h){set[norm(h)]=1});var best=null;
+  PARSERS.forEach(function(p){var s=p.sig.filter(function(x){return set[x]}).length;if(s>=3&&(!best||s>best.score))best={parser:p,score:s}});
+  return best;
+}
+function parseCsv(text){
+  var data=Papa.parse(text.replace(/^\uFEFF/,''),{skipEmptyLines:'greedy'}).data,found=null,i;
+  for(i=0;i<Math.min(data.length,100);i++){var d=detect(data[i].map(function(h){return(h||'').trim()}));if(d&&(!found||d.score>found.score))found={idx:i,parser:d.parser,score:d.score};}
+  if(!found)throw new Error('Unrecognized format. Export the transaction history CSV from PayPal, Venmo, Square or Cash App.');
+  var headers=data[found.idx].map(function(h){return(h||'').trim()});
+  var rows=data.slice(found.idx+1).map(function(c){var o={};headers.forEach(function(h,j){o[h]=c[j]==null?'':c[j]});return o});
+  return{platform:found.parser.platform,rows:found.parser.parse(rows,headers)};
+}
+
+// ---- sorting + export (pure) ----
+var fmt2=function(n){return(Math.round(n*100)/100+0).toFixed(2)};
+function sortChron(rows,dir){
+  var s=dir==='desc'?-1:1;
+  return rows.map(function(t,i){return{t:t,i:i}}).sort(function(a,b){
+    return(a.t.Date<b.t.Date?-s:a.t.Date>b.t.Date?s:0)||(a.i-b.i);
+  }).map(function(x){return x.t});
+}
+var safe=function(s){return /^[=+\-@\t\r]/.test(s)?"'"+s:s};
+function toCsv(rows){
+  return Papa.unparse({fields:['Date','Platform','Payer_Payee','Gross_Amount','Fee','Net_Amount','Type','Note_Description'],
+    data:sortChron(rows,'asc').map(function(t){return[t.Date,t.Platform,safe(t.Payer_Payee),fmt2(t.Gross_Amount),fmt2(t.Fee),fmt2(t.Net_Amount),safe(t.Type),safe(t.Note_Description)]})});
+}
+
+// ---- state + UI ----
+var files=[],tab='All',query='',page=0;
+var $=function(id){return document.getElementById(id)};
+var usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var cls=function(n){return n<0?'neg':'pos'};
+
+function addFiles(list){
+  Promise.all(Array.prototype.map.call(list,function(f){
+    var key=f.name+':'+f.size+':'+f.lastModified;
+    return f.text().then(function(t){var p=parseCsv(t);return{key:key,name:f.name,platform:p.platform,rows:p.rows}})
+      .catch(function(e){return{key:key,name:f.name,rows:[],error:e.message||'Could not read this file.'}});
+  })).then(function(res){
+    var seen={};files.forEach(function(f){seen[f.key]=1});
+    res.forEach(function(r){if(!seen[r.key]){files.push(r);seen[r.key]=1}});
+    page=0;render();
+  });
+}
+function raw(){var a=[];files.forEach(function(f){a=a.concat(f.rows)});return a}
+function all(){return sortChron(raw(),'desc')}
+
+function render(){
+  var A=all(),inc=0,fee=0,net=0;
+  A.forEach(function(t){if(t.Gross_Amount>0)inc+=t.Gross_Amount;fee-=t.Fee;net+=t.Net_Amount});
+  $('files').innerHTML=files.map(function(f,i){
+    return '<li class="'+(f.error?'err':'')+'"><span style="min-width:0"><span class="nm">'+esc(f.name)+'</span><small>'+esc(f.error||f.platform+' · '+f.rows.length+' transactions')+'</small></span><button class="x" data-rm="'+i+'" aria-label="Remove '+esc(f.name)+'">×</button></li>';
+  }).join('');
+  $('stats').innerHTML=[['Total gross income',usd.format(inc),'pos'],['Total fees paid',usd.format(fee),'neg'],['Net balance',usd.format(net),cls(net)],['Transactions',A.length.toLocaleString(),'']].map(function(s){
+    return '<div class="stat"><p>'+s[0]+'</p><strong class="'+s[2]+'">'+s[1]+'</strong></div>';}).join('');
+  $('tabs').innerHTML=['All'].concat(PLATFORMS).map(function(t){
+    var c=t==='All'?A.length:A.filter(function(x){return x.Platform===t}).length;
+    return '<button role="tab" aria-selected="'+(tab===t)+'" data-tab="'+t+'">'+t+'<i>'+c+'</i></button>';}).join('');
+  $('exp').disabled=!A.length;
+
+  var q=query.trim().toLowerCase(),qn=q.replace(/[$,\s]/g,'');
+  var F=A.filter(function(t){
+    if(tab!=='All'&&t.Platform!==tab)return false;if(!q)return true;
+    return t.Payer_Payee.toLowerCase().indexOf(q)>-1||t.Note_Description.toLowerCase().indexOf(q)>-1||(qn!==''&&(t.Gross_Amount.toFixed(2)+' '+t.Net_Amount.toFixed(2)).indexOf(qn)>-1);
+  });
+  var pages=Math.max(1,Math.ceil(F.length/PAGE));page=Math.min(page,pages-1);
+  var S=F.slice(page*PAGE,(page+1)*PAGE);
+  if(!S.length){$('body').innerHTML='<p class="empty">'+(A.length?'No transactions match this search or filter.':'Add a CSV export above to see your transactions here.')+'</p>';return}
+  var list='<ul class="list">'+S.map(function(t){
+    return '<li><div class="l"><div class="who">'+esc(t.Payer_Payee||'—')+'</div><div class="sm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.Note_Description||t.Type)+'</div><div class="sm"><span class="tag">'+t.Platform+'</span> '+t.Date.slice(0,16)+'</div></div><div class="r"><strong class="'+cls(t.Gross_Amount)+'">'+usd.format(t.Gross_Amount)+'</strong>'+(t.Fee?'<div class="sm">fee '+usd.format(t.Fee)+'</div>':'')+'</div></li>';}).join('')+'</ul>';
+  var tbl='<div class="tw"><table><thead><tr><th>Date</th><th>Platform</th><th>Payer / payee</th><th class="n">Gross</th><th class="n">Fee</th><th class="n">Net</th><th>Type</th><th>Note</th></tr></thead><tbody>'+S.map(function(t){
+    return '<tr><td>'+t.Date+'</td><td><span class="tag">'+t.Platform+'</span></td><td>'+esc(t.Payer_Payee)+'</td><td class="n '+cls(t.Gross_Amount)+'">'+usd.format(t.Gross_Amount)+'</td><td class="n sm">'+usd.format(t.Fee)+'</td><td class="n '+cls(t.Net_Amount)+'">'+usd.format(t.Net_Amount)+'</td><td>'+esc(t.Type)+'</td><td>'+esc(t.Note_Description)+'</td></tr>';}).join('')+'</tbody></table></div>';
+  var pg='<div class="pg"><span>'+(page*PAGE+1)+'–'+Math.min((page+1)*PAGE,F.length)+' of '+F.length+'</span><span><button data-pg="-1" aria-label="Previous page"'+(page===0?' disabled':'')+'>‹</button> '+(page+1)+' / '+pages+' <button data-pg="1" aria-label="Next page"'+(page>=pages-1?' disabled':'')+'>›</button></span></div>';
+  $('body').innerHTML=list+tbl+pg;
+}
+
+// ---- events ----
+var drop=$('drop');
+$('pick').addEventListener('change',function(e){if(e.target.files.length)addFiles(e.target.files);e.target.value=''});
+drop.addEventListener('dragover',function(e){e.preventDefault();drop.classList.add('on')});
+drop.addEventListener('dragleave',function(){drop.classList.remove('on')});
+drop.addEventListener('drop',function(e){e.preventDefault();drop.classList.remove('on');addFiles(e.dataTransfer.files)});
+$('q').addEventListener('input',function(e){query=e.target.value;page=0;render()});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.rm!==undefined){files.splice(+b.dataset.rm,1);page=0;render()}
+  else if(b.dataset.tab){tab=b.dataset.tab;page=0;render()}
+  else if(b.dataset.pg){page+=+b.dataset.pg;render()}
+});
+
+function masterCsv(){return toCsv(raw())}
+$('exp').addEventListener('click',function(){
+  var name='ledgermerger-master-'+new Date().toISOString().slice(0,10)+'.csv',msg=$('msg');
+  try{
+    var url=URL.createObjectURL(new Blob(['\uFEFF'+masterCsv()],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');
+    a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url)},1000);
+    msg.textContent='Saved '+name+' to your downloads.';
+  }catch(e){msg.textContent='Could not create the file. Try a different browser.'}
+});
+render();
+})();
+</script>
+</body>
+</html>
