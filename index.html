@@ -84,6 +84,25 @@ td{padding:8px 12px;border-top:1px solid var(--line);white-space:nowrap;max-widt
 .brand{display:flex;align-items:center;gap:14px}.logo{flex:none;width:48px;height:48px;border-radius:22%;box-shadow:0 0 0 1px var(--line)}
 .go.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 .support{margin-top:34px;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--card);text-align:center}.support p{margin:0 0 10px}
+.fb[hidden],.support[hidden],#cols[hidden],#issues[hidden],#warn[hidden]{display:none}
+.cc{margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.cc summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;min-height:44px;padding:6px 14px;font-size:14px;list-style:none}
+.cc summary::-webkit-details-marker{display:none}
+.cb{padding:12px 14px;border-top:1px solid var(--line);overflow-x:auto}
+.cb table{min-width:34rem}.cb th,.cb td{position:static;padding:6px 8px;border-top:1px solid var(--line);white-space:normal;max-width:none;vertical-align:top;text-overflow:clip}
+.cb select{height:38px;max-width:16rem;width:100%;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:0 6px;font-size:14px}
+.cb select.need{border-color:#d97706}
+.smp{display:inline-block;max-width:11rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top;margin:0 4px 4px 0;background:var(--soft);border-radius:5px;padding:1px 6px;font-size:12px}
+.st{font-size:12px;font-weight:600}.st.ok{color:var(--pos)}.st.warn{color:#b45309}
+.lk{background:none;border:0;padding:0;text-decoration:underline;font-size:13px;cursor:pointer}
+.ih{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px}
+.isec{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.isec.bad .ih{background:rgba(217,119,6,.12)}
+.ib{padding:12px 14px;border-top:1px solid var(--line)}
+.ib .tabs{padding:0 0 10px;border:0}.iw{max-height:320px;overflow:auto}.iw th{position:static}.iw td{white-space:normal;max-width:none}
+.warnbox{margin-top:14px;padding:14px;border:1px solid #d97706;border-radius:12px;background:rgba(217,119,6,.1)}
+.warnbox .fbr{justify-content:flex-start;margin-top:10px}
+@media (prefers-color-scheme:dark){.st.warn{color:#fbbf24}}
 </style>
 </head>
 <body>
@@ -98,7 +117,7 @@ td{padding:8px 12px;border-top:1px solid var(--line);white-space:nowrap;max-widt
   <b><span class="m" style="color:inherit;font-size:inherit">Tap to choose CSV files</span><span class="d" style="color:inherit;font-size:inherit">Drop CSV files here, or click to browse</span></b>
   <span>Select several at once. The platform is detected automatically.</span>
 </label>
-<div style="text-align:center;margin-top:12px"><button type="button" class="fb" id="sample">Try it with sample data</button><span class="note" style="display:block;margin:6px 0 0">Fake transactions from all four platforms, so you can see the result in seconds.</span></div>
+<div style="text-align:center;margin-top:12px"><button type="button" class="fb" id="sample">Try it with sample data</button> <button type="button" class="fb" id="folder" hidden>Add a whole folder</button><input type="file" id="folderpick" webkitdirectory multiple hidden><span class="note" style="display:block;margin:6px 0 0">Sample data is fake and shows all four platforms. You can also add a whole folder of exports at once.</span></div>
 <details class="help"><summary>Where do I find my CSV file?</summary><div class="hg">
 <section><h3><span class="tag">PayPal</span></h3><ol><li>Sign in at paypal.com on a computer.</li><li>Click Activity, then All Reports. (Older layout: Activity, then Statements, then Custom.)</li><li>Choose Activity download or a custom statement, set the transaction type to All transactions, pick your date range, and set the format to CSV.</li><li>Click Create Report, then Download once it’s ready.</li></ol><p>A report covers up to 12 months at a time. Large ones can take a while, and PayPal may email you when they’re ready.</p></section>
 <section><h3><span class="tag">Venmo</span></h3><ol><li>Sign in at venmo.com on a computer.</li><li>Click Statements in the left sidebar.</li><li>Pick a month and year from the drop-down.</li><li>Click Download CSV.</li></ol><p>Venmo exports one month at a time, going back about three years. Download each month you need, then add all the files here together.</p></section>
@@ -109,7 +128,12 @@ td{padding:8px 12px;border-top:1px solid var(--line);white-space:nowrap;max-widt
 <details class="help"><summary>How do I know my files stay private?</summary><div style="padding:14px;border-top:1px solid var(--line);font-size:14px"><p style="margin:0 0 8px">There is no server for your files. This page reads and merges them inside your browser tab, and nothing is sent anywhere.</p><p style="margin:0 0 8px"><b>Check it yourself:</b> load this page, switch off your Wi-Fi, then add a file. It still works. Or open your browser’s developer tools, go to the Network tab, and add a file. No requests appear.</p><p style="margin:0 0 8px">The page also tells your browser to block every outside connection, so it couldn’t send data even by mistake. It sets no cookies and loads no analytics or tracking scripts.</p><p class="sm" style="margin:0">Like any website, our host keeps ordinary server logs of page visits. Your files are never part of them. <a href="/privacy">Read the privacy policy</a>.</p></div></details>
 <ul class="files" id="files"></ul>
 
+<section id="cols" hidden style="margin-top:18px"><h2 style="margin:0;font-size:17px">Check how your columns were read</h2><p class="sub" style="margin:4px 0 10px;font-size:14px">Each of your columns is matched to a LedgerMerger field. Open a file to see sample values and change a match.</p><div id="colsbody"></div></section>
+
 <section class="stats" id="stats"></section>
+
+<section class="isec" id="issues" hidden></section>
+<div class="warnbox" id="warn" role="alertdialog" hidden></div>
 
 <section class="panel">
   <div class="bar">
@@ -151,18 +175,22 @@ var PLATFORMS=['PayPal','Venmo','Square','Cash App'], PAGE=25;
 var norm=function(s){return String(s).toLowerCase().replace(/[^a-z0-9]/g,'')};
 var r2=function(n){return Math.round((n+Number.EPSILON)*100)/100};
 var p2=function(n){return String(n).padStart(2,'0')};
+var clip=function(s){return s.length>40?s.slice(0,40)+'\u2026':s};
 
-function money(v){
-  if(v==null)return 0; var s=String(v).trim(); if(!s)return 0;
+// Strict: returns null for empty or unreadable text instead of guessing 0.
+function moneyStrict(v){
+  var s=String(v==null?'':v).trim();
+  if(!s||/\d\s+\d/.test(s))return null;
   var neg=/^\(.*\)$/.test(s)||/[-\u2212\u2013]/.test(s);
-  var n=parseFloat(s.replace(/[^0-9.]/g,''));
-  return isFinite(n)?r2(neg?-n:n)+0:0;
+  var body=s.replace(/USD|CAD|EUR|GBP|[$\u20ac\u00a3\u00a5,\s]/gi,'').replace(/[()+\-\u2212\u2013]/g,'');
+  if(!/^(\d+\.?\d*|\.\d+)$/.test(body))return null;
+  return r2(neg?-parseFloat(body):parseFloat(body))+0;
 }
-function pdate(input){
+function pdate(input,dmy){
   var s=(input||'').trim(); if(!s)return null;
   var y=0,mo=0,d=0,rest='',m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})(.*)/);
   if(m){y=+m[1];mo=+m[2];d=+m[3];rest=m[4];}
-  else if((m=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})(.*)/))){mo=+m[1];d=+m[2];y=+m[3];rest=m[4];if(y<100)y+=2000;}
+  else if((m=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})(.*)/))){if(dmy){d=+m[1];mo=+m[2]}else{mo=+m[1];d=+m[2]}y=+m[3];rest=m[4];if(y<100)y+=2000;}
   else if(/^[A-Za-z]{3,9}\.? \d{1,2},? \d{4}/.test(s)){var dt=new Date(s);if(isNaN(+dt))return null;y=dt.getFullYear();mo=dt.getMonth()+1;d=dt.getDate();rest=s.replace(/^[A-Za-z]{3,9}\.? \d{1,2},? \d{4}/,'');}
   else return null;
   var t=rest.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i),h=t?+t[1]:0,mi=t?+t[2]:0,se=t&&t[3]?+t[3]:0;
@@ -170,9 +198,11 @@ function pdate(input){
   if(mo<1||mo>12||d<1||d>31||h>23)return null;
   return y+'-'+p2(mo)+'-'+p2(d)+' '+p2(h)+':'+p2(mi)+':'+p2(se);
 }
-function findCol(headers,aliases){
+function dateHint(s){var m=s.match(/^(\d{1,2})\/(\d{1,2})\//);return m&&+m[1]>12&&+m[2]<=12?' It looks like DD/MM/YYYY, so switch the date format in the column check.':''}
+function findCol(headers,aliases,exact){
   var hs=headers.map(function(h){return[h,norm(h)]}),i,n,hit;
   for(i=0;i<aliases.length;i++){n=norm(aliases[i]);hit=hs.find(function(x){return x[1]===n});if(hit)return hit[0];}
+  if(exact)return undefined;
   for(i=0;i<aliases.length;i++){n=norm(aliases[i]);if(n.length<3)continue;hit=hs.find(function(x){return x[1].indexOf(n)>-1});if(hit)return hit[0];}
 }
 function getter(headers){
@@ -184,47 +214,88 @@ function getter(headers){
   };
 }
 var inactive=function(s){return /denied|fail|cancel|void|expired|declin/i.test(s)};
-function build(pl,date,payer,gross,fee,type,note){
-  if(!date||(gross===0&&fee===0))return null;
-  var f=-Math.abs(fee)+0;
-  return{Date:date,Platform:pl,Payer_Payee:payer.trim(),Gross_Amount:gross,Fee:f,Net_Amount:r2(gross+f),Type:type.trim(),Note_Description:note.trim()};
-}
-function each(rows,fn){var out=[];rows.forEach(function(r){var t=fn(r);if(t)out.push(t)});return out}
-
+var statusEx=function(g,r){var s=g(r,'Status');return inactive(s)?'Status: '+s:''};
 var BRAND=/^(visa|master ?card|american express|amex|discover|diners(?: club)?|jcb|union ?pay|interac|eftpos)(?:\s+(?:card|credit|debit))?(?:\s*(?:\*+|x+|ending in\s*)?\d{0,4})?$/i;
 function squarePayer(name,brand){if(name&&!BRAND.test(name))return name;var b=brand||name;return b?'Square Customer ('+b+')':'Square Customer';}
-var PARSERS=[
+
+var FIELDS=['date','time','payer','payee','gross','debit','credit','fee','type','note'];
+var PROFILES=[
 {platform:'PayPal',sig:['gross','fee','net','balanceimpact','fromemailaddress','toemailaddress','amountusd','name','transactionid'],
- parse:function(rows,h){var g=getter(h);return each(rows,function(r){
-  var imp=g(r,'Balance Impact');if(/memo/i.test(imp)||inactive(g(r,'Status')))return null;
-  var gross=money(g(r,'Gross','Amount (USD)','Amount'));if(/debit/i.test(imp)&&gross>0)gross=-gross;
-  return build('PayPal',pdate(g(r,'Date')+' '+g(r,'Time')),g(r,'Name')||g(r,'To Email Address')||g(r,'From Email Address'),gross,money(g(r,'Fee')),g(r,'Type','Description'),g(r,'Subject')||g(r,'Note')||g(r,'Item Title'));});}},
+ al:{date:['Date'],time:['Time'],payer:['Name'],gross:['Gross','Amount (USD)','Amount'],fee:['Fee'],type:['Type','Description'],note:['Subject','Note','Item Title']},
+ pf:['To Email Address','From Email Address'],nf:['Note','Item Title'],
+ ex:function(g,r){if(/memo/i.test(g(r,'Balance Impact')))return'Memo row (does not change your balance)';return statusEx(g,r)},
+ out:function(g,r){return/debit/i.test(g(r,'Balance Impact'))}},
 {platform:'Venmo',sig:['datetime','amounttotal','amountfee','amounttip','fundingsource','destination','from','to'],
- parse:function(rows,h){var g=getter(h);return each(rows,function(r){
-  if(inactive(g(r,'Status')))return null;
-  var gross=money(g(r,'Amount (total)','Amount')),from=g(r,'From'),to=g(r,'To');
-  var payer=(gross>=0?from:to)||g(r,'Destination')||from||to||'Venmo';
-  return build('Venmo',pdate(g(r,'Datetime','Date')),payer,gross,money(g(r,'Amount (fee)','Fee')),g(r,'Type'),g(r,'Note'));});}},
+ al:{date:['Datetime','Date'],payer:['From'],payee:['To'],gross:['Amount (total)','Amount'],fee:['Amount (fee)','Fee'],type:['Type'],note:['Note']},
+ pf:['Destination'],pd:'Venmo',ex:statusEx},
 {platform:'Square',sig:['paymentid','devicename','totalcollected','grosssales','netsales','nettotal','fees','cardbrand','eventtype'],
- parse:function(rows,h){var g=getter(h);return each(rows,function(r){
-  return build('Square',pdate(g(r,'Date')+' '+g(r,'Time')),squarePayer(g(r,'Customer Name'),g(r,'Card Brand')),money(g(r,'Total Collected','Gross Sales','Gross','Amount')),money(g(r,'Fees','Fee','Processing Fee')),g(r,'Event Type','Transaction Type','Category'),g(r,'Description')||g(r,'Item')||g(r,'Notes')||g(r,'Details'));});}},
+ al:{date:['Date'],time:['Time'],payer:['Customer Name'],gross:['Total Collected','Gross Sales','Gross','Amount'],fee:['Fees','Fee','Processing Fee'],type:['Event Type','Transaction Type','Category'],note:['Description','Item','Notes','Details']},
+ nf:['Item','Notes','Details'],brand:true},
 {platform:'Cash App',sig:['transactiontype','netamount','nameofsenderreceiver','assettype','assetprice','transactionid','fee','notes','status','currency'],
- parse:function(rows,h){var g=getter(h);return each(rows,function(r){
-  if(inactive(g(r,'Status')))return null;
-  return build('Cash App',pdate(g(r,'Date')),g(r,'Name of sender/receiver','Name')||g(r,'Account')||'Cash App',money(g(r,'Amount','Gross')),money(g(r,'Fee')),g(r,'Transaction Type','Type'),g(r,'Notes','Note'));});}}
+ al:{date:['Date'],payer:['Name of sender/receiver','Name'],gross:['Amount','Gross'],fee:['Fee'],type:['Transaction Type','Type'],note:['Notes','Note']},
+ pf:['Account'],pd:'Cash App',ex:statusEx}
 ];
+// Guesses for a file from an unknown source (a bank export, another app). Every one can be changed.
+var GENERIC={date:['Date','Transaction Date','Posted Date','Posting Date','Datetime'],payer:['Payee','Name','Merchant','Description'],gross:['Amount','Amount (USD)','Total'],debit:['Debit','Withdrawal','Withdrawals','Money Out'],credit:['Credit','Deposit','Deposits','Money In'],fee:['Fee','Fees'],type:['Type','Transaction Type','Category'],note:['Memo','Notes','Note','Description','Details']};
+function profileFor(p){return PROFILES.filter(function(x){return x.platform===p})[0]}
+function autoMap(al,headers){var m={};FIELDS.forEach(function(f){var a=al[f];if(!a||!a.length)return;var h=findCol(headers,a,f==='time');if(h!==undefined)m[f]=h});return m}
+function autoMapFor(csv){var p=profileFor(csv.platform);return autoMap(p?p.al:GENERIC,csv.headers)}
+function mappingProblems(m){var p=[];if(!m.date)p.push('Choose the column that holds the date.');if(!m.gross&&!m.debit&&!m.credit)p.push('Choose the amount column (or the Debit and Credit columns).');return p}
+
+// Merges one file with its current column mapping, and lists every row that was not merged cleanly.
+function applyMapping(csv,opts){
+  opts=opts||{};
+  var m=opts.mapping||csv.mapping,problems=mappingProblems(m),out={platform:csv.platform,rows:[],issues:[],ignored:0,mapping:m,problems:problems};
+  if(problems.length)return out;
+  var pr=profileFor(csv.platform),g=getter(csv.headers);
+  csv.body.forEach(function(x){
+    var n=x.n,r=x.row,cells=x.cells;
+    var cell=function(f){return m[f]?String(r[m[f]]==null?'':r[m[f]]).trim():''};
+    var flag=function(kind,reason){out.issues.push({n:n,kind:kind,reason:reason,cells:cells})};
+    var why=pr&&pr.ex?pr.ex(g,r):'';
+    if(why){flag('excluded',why);return}
+    var dt=cell('date'),dateStr=dt?[dt,cell('time')].filter(Boolean).join(' '):'';
+    var gross=null,amountText='',amountBad=false;
+    if(m.gross){amountText=cell('gross');if(amountText){gross=moneyStrict(amountText);amountBad=gross===null}}
+    else{var ds=cell('debit'),cs=cell('credit');amountText=ds||cs;if(ds||cs){var dv=ds?moneyStrict(ds):0,cv=cs?moneyStrict(cs):0;if(dv===null||cv===null){amountBad=true;amountText=dv===null?ds:cs}else gross=r2(Math.abs(cv)-Math.abs(dv))}}
+    var date=dateStr?pdate(dateStr,opts.dmy):null;
+    // No amount and no readable date, and the line is empty or nearly empty: a footer, note or balance line, not a transaction.
+    if(!amountText&&!date&&(!dateStr||cells.filter(function(c){return String(c).trim()}).length<=2)){out.ignored++;return}
+    var errs=[];
+    if(!date)errs.push(dateStr?'Unreadable date "'+clip(dateStr)+'".'+dateHint(dateStr):'Missing date.');
+    if(gross===null)errs.push(amountBad?'Unreadable amount "'+clip(amountText)+'".':'Missing amount.');
+    if(errs.length){flag('error',errs.join(' '));return}
+    var feeText=cell('fee'),fee=feeText?moneyStrict(feeText):0;
+    if(fee===null){flag('warning','Fee "'+clip(feeText)+'" could not be read, so it was counted as $0.00.');fee=0}
+    if(gross>0&&pr&&pr.out&&pr.out(g,r))gross=-gross;
+    if(gross===0&&fee===0){flag('excluded','Zero amount (nothing to merge).');return}
+    var payer;
+    if(pr&&pr.brand)payer=squarePayer(cell('payer'),g(r,'Card Brand'));
+    else{var pp=gross>=0?[cell('payer'),cell('payee')]:[cell('payee'),cell('payer')],cand=[pp[0]].concat((pr&&pr.pf||[]).map(function(k){return g(r,k)}),[pp[1]]);payer=cand.filter(Boolean)[0]||(pr&&pr.pd)||''}
+    var note=cell('note')||((pr&&pr.nf||[]).map(function(k){return g(r,k)}).filter(Boolean)[0])||'';
+    var fe=-Math.abs(fee)+0;
+    out.rows.push({Date:date,Platform:csv.platform,Payer_Payee:payer.trim(),Gross_Amount:gross,Fee:fe,Net_Amount:r2(gross+fe),Type:cell('type').trim(),Note_Description:note.trim()});
+  });
+  return out;
+}
 function detect(headers){
   var set={};headers.forEach(function(h){set[norm(h)]=1});var best=null;
-  PARSERS.forEach(function(p){var s=p.sig.filter(function(x){return set[x]}).length;if(s>=3&&(!best||s>best.score))best={parser:p,score:s}});
+  PROFILES.forEach(function(p){var sc=p.sig.filter(function(x){return set[x]}).length;if(sc>=3&&(!best||sc>best.score))best={profile:p,score:sc}});
   return best;
 }
-function parseCsv(text){
-  var data=Papa.parse(text.replace(/^\uFEFF/,''),{skipEmptyLines:'greedy'}).data,found=null,i;
-  for(i=0;i<Math.min(data.length,100);i++){var d=detect(data[i].map(function(h){return(h||'').trim()}));if(d&&(!found||d.score>found.score))found={idx:i,parser:d.parser,score:d.score};}
-  if(!found)throw new Error('Unrecognized format. Export the transaction history CSV from PayPal, Venmo, Square or Cash App.');
-  var headers=data[found.idx].map(function(h){return(h||'').trim()});
-  var rows=data.slice(found.idx+1).map(function(c){var o={};headers.forEach(function(h,j){o[h]=c[j]==null?'':c[j]});return o});
-  return{platform:found.parser.platform,rows:found.parser.parse(rows,headers)};
+// Reads CSV text in memory: finds the header row, detects the platform (or falls back to "Other"), keeps every row.
+function readCsv(text){
+  var data=Papa.parse(text.replace(/^\uFEFF/,''),{skipEmptyLines:'greedy'}).data,found=null,i,idx,platform,mapping;
+  var clean=function(c){return c.map(function(h){return(h||'').trim()})};
+  for(i=0;i<Math.min(data.length,100);i++){var d=detect(clean(data[i]));if(d&&(!found||d.score>found.score))found={idx:i,profile:d.profile,score:d.score}}
+  if(found){idx=found.idx;platform=found.profile.platform;mapping=autoMap(found.profile.al,clean(data[idx]))}
+  else{
+    idx=-1;for(i=0;i<Math.min(data.length,100);i++){var h=clean(data[i]);if(h.filter(Boolean).length>=3&&!mappingProblems(autoMap(GENERIC,h)).length){idx=i;break}}
+    if(idx<0)throw new Error('Could not find a Date column and an Amount (or Debit and Credit) column in this file. Check that it is a transaction export.');
+    platform='Other';mapping=autoMap(GENERIC,clean(data[idx]));
+  }
+  var headers=clean(data[idx]),body=data.slice(idx+1).map(function(cells,j){var row={};headers.forEach(function(hh,k){row[hh]=cells[k]==null?'':cells[k]});return{n:idx+2+j,cells:cells,row:row}});
+  return{platform:platform,headers:headers,body:body,mapping:mapping,needsReview:platform==='Other'||mappingProblems(mapping).length>0};
 }
 
 // ---- sorting + export (pure) ----
@@ -239,6 +310,12 @@ var safe=function(s){return /^[=+\-@\t\r]/.test(s)?"'"+s:s};
 function toCsv(rows){
   return Papa.unparse({fields:['Date','Platform','Payer_Payee','Gross_Amount','Fee','Net_Amount','Type','Note_Description'],
     data:sortChron(rows,'asc').map(function(t){return[t.Date,t.Platform,safe(t.Payer_Payee),fmt2(t.Gross_Amount),fmt2(t.Fee),fmt2(t.Net_Amount),safe(t.Type),safe(t.Note_Description)]})});
+}
+
+var ISSUE_LABEL={error:'Needs attention (left out)',warning:'Merged with a warning',excluded:'Left out on purpose'};
+function toIssuesCsv(items){
+  return Papa.unparse({fields:['File','Row','Platform','Status','Reason','Original_Row'],
+    data:items.map(function(i){return[safe(i.file),i.n,i.platform,ISSUE_LABEL[i.kind],safe(i.reason),safe(Papa.unparse({fields:i.cells,data:[]}))]})});
 }
 
 var XNS='http://schemas.openxmlformats.org/spreadsheetml/2006/main',XHEAD='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n',ENC=new TextEncoder();
@@ -276,47 +353,88 @@ function toXlsx(rows){
 var SAMPLES=[['sample-paypal.csv',['Date,Time,TimeZone,Name,Type,Status,Currency,Gross,Fee,Net,From Email Address,To Email Address,Transaction ID,Subject,Note,Balance Impact','03/05/2024,14:22:10,PST,Acme Client LLC,Express Checkout Payment,Completed,USD,100.00,-3.20,96.80,billing@acme.example,me@shop.example,1AB23,Logo design,Invoice 1042,Credit','03/07/2024,09:05:41,PST,Adobe Inc.,Bill User Payment,Completed,USD,-54.99,0.00,-54.99,me@shop.example,pay@adobe.example,2BC34,Creative Cloud,Monthly plan,Debit','03/09/2024,18:40:02,PST,Jamie Rivera,Mobile Payment,Completed,USD,"1,250.00",-36.55,"1,213.45",jamie@example.com,me@shop.example,3CD45,Consulting,March retainer,Credit'].join('\n')],['sample-venmo.csv',['Account Statement - (@mystore),,,','Datetime header below,,,',',ID,Datetime,Type,Status,Note,From,To,Amount (total),Amount (tip),Amount (tax),Amount (fee),Tax Rate,Tax Exempt,Funding Source,Destination','',',3912,2024-03-04T19:12:33,Payment,Complete,Dinner split,Sam Lee,Me Myself,+ $42.50,,,$0.00,0,,Venmo balance,',',3913,2024-03-06T08:45:10,Payment,Complete,Rent share,Me Myself,Taylor Kim,- $600.00,,,$0.00,0,,Venmo balance,',',3914,2024-03-08T12:00:00,Charge,Complete,Photo print order,Pat Nguyen,Me Myself,+ $120.00,,,$3.48,0,,Venmo balance,'].join('\n')],['sample-square.csv',['Date,Time,Time Zone,Description,Total Collected,Fees,Payment ID,Card Brand,Customer Name,Event Type','2024-03-05,10:15:22,Pacific,Cold brew x2,$9.74,-$0.58,PAY1,Visa,Walk-in,Payment','2024-03-05,13:40:09,Pacific,Beans x3,$54.20,-$1.87,PAY2,Mastercard,Riley Chen,Payment','2024-03-06,16:02:51,Pacific,Refund: cold brew,-$9.74,$0.00,PAY3,Visa,Walk-in,Refund','2024-03-07,11:00:00,Pacific,Latte,$5.41,-$0.46,PAY4,Visa,,Payment'].join('\n')],['sample-cashapp.csv',['Transaction ID,Date,Transaction Type,Currency,Amount,Fee,Net Amount,Asset Type,Asset Price,Asset Amount,Status,Notes,Name of sender/receiver,Account','C1,2024-03-03 09:30:12 EST,P2P,USD,$25.00,$0.00,$25.00,,,,COMPLETE,Coffee money,Dana Ortiz,Cash balance','C2,2024-03-06 17:05:44 EST,P2P,USD,-$80.00,$0.00,-$80.00,,,,COMPLETE,Concert tickets,Chris Park,Cash balance','C3,2024-03-09 08:15:00 EST,Instant Deposit,USD,-$200.00,$3.00,-$203.00,,,,COMPLETE,,Bank transfer,Cash balance'].join('\n')]];
 
 // ---- state + UI ----
-var files=[],tab='All',query='',page=0;
+var files=[],tab='All',query='',page=0,pending=null,iview='attention';
 var $=function(id){return document.getElementById(id)};
 var usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 var cls=function(n){return n<0?'neg':'pos'};
+var LABEL={date:['Date','required'],time:['Time','optional'],payer:['Payer / payee','who the money came from or went to'],payee:['Payee (money out)','used instead when money goes out'],gross:['Amount','required, or use Debit and Credit'],debit:['Debit (money out)','optional'],credit:['Credit (money in)','optional'],fee:['Fee','optional'],type:['Type','optional'],note:['Note / description','optional']};
+var MAIN=['date','payer','gross','fee','type','note'],MORE=['time','payee','debit','credit'],ALLF=['date','time','payer','payee','gross','debit','credit','fee','type','note'];
+var today=function(){return new Date().toISOString().slice(0,10)};
+function say(t){$('msg').textContent=t}
+function save(parts,name,type){var url=URL.createObjectURL(new Blob(parts,{type:type})),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000)}
 
-function addFiles(list){
+function reparse(f){f.res=f.csv?applyMapping(f.csv,{mapping:f.mapping||f.csv.mapping,dmy:f.dmy}):null}
+function makeFile(key,name,text){var o={key:key,name:name,csv:readCsv(text),dmy:false,more:false};reparse(o);o.open=o.res.problems.length>0||o.csv.needsReview||o.res.issues.some(function(i){return i.kind==='error'});return o}
+function addCsvFiles(list,nameOf){
   Promise.all(Array.prototype.map.call(list,function(f){
-    var key=f.name+':'+f.size+':'+f.lastModified;
-    return f.text().then(function(t){var p=parseCsv(t);return{key:key,name:f.name,platform:p.platform,rows:p.rows}})
-      .catch(function(e){return{key:key,name:f.name,rows:[],error:e.message||'Could not read this file.'}});
-  })).then(function(res){
-    var seen={};files.forEach(function(f){seen[f.key]=1});
-    res.forEach(function(r){if(!seen[r.key]){files.push(r);seen[r.key]=1}});
-    page=0;render();
-  });
+    var nm=nameOf(f),key=nm+':'+f.size+':'+f.lastModified;
+    return f.text().then(function(t){return makeFile(key,nm,t)}).catch(function(e){return{key:key,name:nm,error:e.message||'Could not read this file.'}});
+  })).then(function(res){var seen={};files.forEach(function(f){seen[f.key]=1});res.forEach(function(r){if(!seen[r.key]){files.push(r);seen[r.key]=1}});pending=null;page=0;render()});
 }
 function loadSample(){
-  SAMPLES.forEach(function(x){
-    var key='sample:'+x[0];
-    if(files.some(function(f){return f.key===key}))return;
-    var p=parseCsv(x[1]);files.push({key:key,name:x[0],platform:p.platform,rows:p.rows});
-  });
-  page=0;render();$('stats').scrollIntoView({behavior:'smooth',block:'start'});
+  SAMPLES.forEach(function(x){var key='sample:'+x[0];if(files.some(function(f){return f.key===key}))return;files.push(makeFile(key,x[0],x[1]))});
+  pending=null;page=0;render();$('stats').scrollIntoView({behavior:'smooth',block:'start'});
 }
-function raw(){var a=[];files.forEach(function(f){a=a.concat(f.rows)});return a}
+function raw(){var a=[];files.forEach(function(f){if(f.res)a=a.concat(f.res.rows)});return a}
 function all(){return sortChron(raw(),'desc')}
+function issueItems(){var a=[];files.forEach(function(f){if(f.res)f.res.issues.forEach(function(i){a.push({file:f.name,platform:f.res.platform,n:i.n,kind:i.kind,reason:i.reason,cells:i.cells})})});return a}
+function errCount(){return issueItems().filter(function(i){return i.kind==='error'}).length}
 
-function render(){
-  var A=all(),inc=0,fee=0,net=0;
-  A.forEach(function(t){if(t.Gross_Amount>0)inc+=t.Gross_Amount;fee-=t.Fee;net+=t.Net_Amount});
-  $('files').innerHTML=files.map(function(f,i){
-    return '<li class="'+(f.error?'err':'')+'"><span style="min-width:0"><span class="nm">'+esc(f.name)+'</span><small>'+esc(f.error||f.platform+' · '+f.rows.length+' transactions')+'</small></span><button class="x" data-rm="'+i+'" aria-label="Remove '+esc(f.name)+'">×</button></li>';
+function samples(csv,h){var o=[],i,v;if(!h)return o;for(i=0;i<csv.body.length&&o.length<3;i++){v=String(csv.body[i].row[h]==null?'':csv.body[i].row[h]).trim();if(v)o.push(v)}return o}
+function colCard(f,fi){
+  var r=f.res,m=f.mapping||f.csv.mapping,auto=autoMapFor(f.csv),errs=r.issues.filter(function(i){return i.kind==='error'}).length;
+  var status=r.problems.length?'<span class="st warn">\u26a0 Needs a column</span>':errs?'<span class="st warn">\u26a0 '+errs+(errs===1?' row needs':' rows need')+' attention</span>':'<span class="st ok">\u2713 Columns matched \u00b7 '+r.rows.length+' merged</span>';
+  var showMore=f.more||MORE.some(function(k){return m[k]}),fields=showMore?ALLF:MAIN,changed=ALLF.some(function(k){return(m[k]||'')!==(auto[k]||'')});
+  var rowsHtml=fields.map(function(k){
+    var sel=m[k]||'',miss=(k==='date'&&!sel)||(k==='gross'&&!sel&&!m.debit&&!m.credit),sm=samples(f.csv,sel);
+    var opts='<option value="">\u2014 none \u2014</option>'+f.csv.headers.filter(Boolean).map(function(h){return'<option value="'+esc(h)+'"'+(h===sel?' selected':'')+'>'+esc(h)+'</option>'}).join('');
+    var tag=sel?(sel===auto[k]?'<span class="sm"> auto</span>':'<span class="sm" style="color:#0369a1"> changed</span>'):'';
+    return'<tr><td><b>'+LABEL[k][0]+'</b><div class="sm">'+LABEL[k][1]+'</div></td><td><select data-f="'+fi+'" data-k="'+k+'" aria-label="Column for '+LABEL[k][0]+'"'+(miss?' class="need"':'')+'>'+opts+'</select>'+tag+'</td><td>'+(sm.length?sm.map(function(v){return'<span class="smp">'+esc(v)+'</span>'}).join(''):'<span class="sm">'+(miss?'Choose a column':'\u2014')+'</span>')+'</td></tr>';
   }).join('');
+  var ds=samples(f.csv,m.date)[0],ts=m.time?samples(f.csv,m.time)[0]:'',reads=ds?pdate([ds,ts].filter(Boolean).join(' '),f.dmy):null,foot='';
+  if(!showMore)foot+='<button type="button" class="lk" data-more="'+fi+'">Time, payee and Debit/Credit columns</button> ';
+  if(m.date)foot+='<label class="sm" style="margin:0 12px">Date format <select data-f="'+fi+'" data-dmy="1" style="width:auto;height:34px"><option value="mdy"'+(f.dmy?'':' selected')+'>MM/DD/YYYY (US)</option><option value="dmy"'+(f.dmy?' selected':'')+'>DD/MM/YYYY</option></select></label>';
+  if(ds)foot+='<span class="sm">\u201c'+esc(ds+(ts?' '+ts:''))+'\u201d is read as <b>'+(reads?esc(reads):'an unreadable date')+'</b></span> ';
+  if(changed)foot+='<button type="button" class="lk" data-reset="'+fi+'">Reset to automatic</button>';
+  var note=f.csv.platform==='Other'?'<p style="margin:0 0 10px;padding:10px;border-radius:8px;background:rgba(217,119,6,.12);font-size:14px">This file is not from PayPal, Venmo, Square or Cash App, so LedgerMerger guessed the columns. Check each one below.</p>':'';
+  var probs=r.problems.map(function(p){return'<p class="st warn" style="margin:0 0 8px">'+esc(p)+'</p>'}).join('');
+  return'<details class="cc" data-fi="'+fi+'"'+(f.open?' open':'')+'><summary><b>'+esc(f.name)+'</b><span class="tag">'+(f.csv.platform==='Other'?'Other (map by hand)':f.csv.platform)+'</span>'+status+'</summary><div class="cb">'+note+probs+'<table><thead><tr><th>LedgerMerger field</th><th>Your column</th><th>Sample values from your file</th></tr></thead><tbody>'+rowsHtml+'</tbody></table><div style="margin-top:10px">'+foot+'</div></div></details>';
+}
+function renderCols(){var has=files.some(function(f){return f.csv});$('cols').hidden=!has;$('colsbody').innerHTML=files.map(function(f,i){return f.csv?colCard(f,i):''}).join('')}
+function renderChips(){$('files').innerHTML=files.map(function(f,i){var sub=f.error?f.error:f.res.platform+' \u00b7 '+f.res.rows.length+' transactions';return'<li class="'+(f.error?'err':'')+'"><span style="min-width:0"><span class="nm">'+esc(f.name)+'</span><small>'+esc(sub)+'</small></span><button class="x" data-rm="'+i+'" aria-label="Remove '+esc(f.name)+'">\u00d7</button></li>'}).join('')}
+function renderIssues(){
+  var box=$('issues'),has=files.some(function(f){return f.csv});box.hidden=!has;if(!has)return;
+  var items=issueItems(),er=0,wa=0,ex=0,ig=0,merged=raw().length;
+  items.forEach(function(i){if(i.kind==='error')er++;else if(i.kind==='warning')wa++;else ex++});
+  files.forEach(function(f){if(f.res)ig+=f.res.ignored});
+  var clean=!er&&!wa,list=items.filter(function(i){return iview==='attention'?i.kind!=='excluded':i.kind==='excluded'});
+  var head='<div class="ih" role="status"><div><b>'+(clean?'\u2713 Every row was read. '+merged.toLocaleString()+' transactions are ready to merge.':'\u26a0 '+er+(er===1?' row was':' rows were')+' left out because '+(er===1?'it':'they')+' could not be read'+(wa?', and '+wa+' merged with a warning':'')+'.')+'</b><div class="sm">'+merged.toLocaleString()+' merged \u00b7 '+er+' need attention \u00b7 '+wa+' warnings \u00b7 '+ex+' left out on purpose (failed, memo or zero-amount) \u00b7 '+ig+' blank or footer lines ignored</div></div>'+(items.length?'<button type="button" class="fb" data-dl="1">Download skipped rows (CSV)</button>':'')+'</div>';
+  var body='';
+  if(items.length){
+    body='<div class="ib"><div class="tabs" role="tablist"><button role="tab" aria-selected="'+(iview==='attention')+'" data-iv="attention">Needs attention ('+(er+wa)+')</button><button role="tab" aria-selected="'+(iview==='excluded')+'" data-iv="excluded">Left out on purpose ('+ex+')</button></div>';
+    body+=list.length?'<div class="iw"><table><thead><tr><th>File</th><th>Row</th><th>What happened</th><th>Row contents</th></tr></thead><tbody>'+list.slice(0,50).map(function(i){return'<tr><td>'+esc(i.file)+'</td><td>'+i.n+'</td><td><div class="sm">'+ISSUE_LABEL[i.kind]+'</div>'+esc(i.reason)+'</td><td class="sm">'+esc(i.cells.filter(function(c){return String(c).trim()}).join(' | ').slice(0,160))+'</td></tr>'}).join('')+'</tbody></table>'+(list.length>50?'<p class="sm">Showing the first 50 of '+list.length+'. The download has them all.</p>':'')+'</div>':'<p class="sm">Nothing here.</p>';
+    body+='</div>';
+  }
+  box.className='isec'+(clean?'':' bad');box.innerHTML=head+body;
+}
+function renderWarn(){
+  var w=$('warn');if(!pending){w.hidden=true;return}
+  var n=errCount();w.hidden=false;
+  w.innerHTML='<b>'+n+(n===1?' row':' rows')+' will be left out of this export.</b><div class="sm" style="font-size:14px;margin-top:4px">They could not be read with the current column settings. Fix the column check above, or download the list and correct them in your original file.</div><div class="fbr"><button type="button" class="fb" data-w="dl">Download skipped rows</button><button type="button" class="fb" data-w="go">Export anyway</button><button type="button" class="lk" data-w="back">Go back and review</button></div>';
+}
+function renderStats(A){
+  var inc=0,fee=0,net=0;
+  A.forEach(function(t){if(t.Gross_Amount>0)inc+=t.Gross_Amount;fee-=t.Fee;net+=t.Net_Amount});
   $('stats').innerHTML=[['Total gross income',usd.format(inc),'pos'],['Total fees paid',usd.format(fee),'neg'],['Net balance',usd.format(net),cls(net)],['Transactions',A.length.toLocaleString(),'']].map(function(s){
     return '<div class="stat"><p>'+s[0]+'</p><strong class="'+s[2]+'">'+s[1]+'</strong></div>';}).join('');
-  $('tabs').innerHTML=['All'].concat(PLATFORMS).map(function(t){
+}
+function renderTable(A){
+  var hasOther=A.some(function(t){return t.Platform==='Other'}),tabs=['All'].concat(PLATFORMS,hasOther?['Other']:[]);
+  if(tabs.indexOf(tab)<0)tab='All';
+  $('tabs').innerHTML=tabs.map(function(t){
     var c=t==='All'?A.length:A.filter(function(x){return x.Platform===t}).length;
     return '<button role="tab" aria-selected="'+(tab===t)+'" data-tab="'+t+'">'+t+'<i>'+c+'</i></button>';}).join('');
-  $('exp').disabled=!A.length;$('xl').disabled=!A.length;
-
   var q=query.trim().toLowerCase(),qn=q.replace(/[$,\s]/g,'');
   var F=A.filter(function(t){
     if(tab!=='All'&&t.Platform!==tab)return false;if(!q)return true;
@@ -326,50 +444,59 @@ function render(){
   var S=F.slice(page*PAGE,(page+1)*PAGE);
   if(!S.length){$('body').innerHTML='<p class="empty">'+(A.length?'No transactions match this search or filter.':'Add a CSV export above to see your transactions here.')+'</p>';return}
   var list='<ul class="list">'+S.map(function(t){
-    return '<li><div class="l"><div class="who">'+esc(t.Payer_Payee||'—')+'</div><div class="sm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.Note_Description||t.Type)+'</div><div class="sm"><span class="tag">'+t.Platform+'</span> '+t.Date.slice(0,16)+'</div></div><div class="r"><strong class="'+cls(t.Gross_Amount)+'">'+usd.format(t.Gross_Amount)+'</strong>'+(t.Fee?'<div class="sm">fee '+usd.format(t.Fee)+'</div>':'')+'</div></li>';}).join('')+'</ul>';
+    return '<li><div class="l"><div class="who">'+esc(t.Payer_Payee||'\u2014')+'</div><div class="sm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.Note_Description||t.Type)+'</div><div class="sm"><span class="tag">'+t.Platform+'</span> '+t.Date.slice(0,16)+'</div></div><div class="r"><strong class="'+cls(t.Gross_Amount)+'">'+usd.format(t.Gross_Amount)+'</strong>'+(t.Fee?'<div class="sm">fee '+usd.format(t.Fee)+'</div>':'')+'</div></li>';}).join('')+'</ul>';
   var tbl='<div class="tw"><table><thead><tr><th>Date</th><th>Platform</th><th>Payer / payee</th><th class="n">Gross</th><th class="n">Fee</th><th class="n">Net</th><th>Type</th><th>Note</th></tr></thead><tbody>'+S.map(function(t){
     return '<tr><td>'+t.Date+'</td><td><span class="tag">'+t.Platform+'</span></td><td>'+esc(t.Payer_Payee)+'</td><td class="n '+cls(t.Gross_Amount)+'">'+usd.format(t.Gross_Amount)+'</td><td class="n sm">'+usd.format(t.Fee)+'</td><td class="n '+cls(t.Net_Amount)+'">'+usd.format(t.Net_Amount)+'</td><td>'+esc(t.Type)+'</td><td>'+esc(t.Note_Description)+'</td></tr>';}).join('')+'</tbody></table></div>';
-  var pg='<div class="pg"><span>'+(page*PAGE+1)+'–'+Math.min((page+1)*PAGE,F.length)+' of '+F.length+'</span><span><button data-pg="-1" aria-label="Previous page"'+(page===0?' disabled':'')+'>‹</button> '+(page+1)+' / '+pages+' <button data-pg="1" aria-label="Next page"'+(page>=pages-1?' disabled':'')+'>›</button></span></div>';
+  var pg='<div class="pg"><span>'+(page*PAGE+1)+'\u2013'+Math.min((page+1)*PAGE,F.length)+' of '+F.length+'</span><span><button data-pg="-1" aria-label="Previous page"'+(page===0?' disabled':'')+'>\u2039</button> '+(page+1)+' / '+pages+' <button data-pg="1" aria-label="Next page"'+(page>=pages-1?' disabled':'')+'>\u203a</button></span></div>';
   $('body').innerHTML=list+tbl+pg;
 }
+function render(){var A=all();renderChips();renderCols();renderStats(A);renderIssues();renderWarn();$('exp').disabled=!A.length;$('xl').disabled=!A.length;renderTable(A)}
 
 // ---- events ----
 var drop=$('drop');
-$('pick').addEventListener('change',function(e){if(e.target.files.length)addFiles(e.target.files);e.target.value=''});
+$('pick').addEventListener('change',function(e){if(e.target.files.length)addCsvFiles(e.target.files,function(f){return f.name});e.target.value=''});
 drop.addEventListener('dragover',function(e){e.preventDefault();drop.classList.add('on')});
 drop.addEventListener('dragleave',function(){drop.classList.remove('on')});
-drop.addEventListener('drop',function(e){e.preventDefault();drop.classList.remove('on');addFiles(e.dataTransfer.files)});
+drop.addEventListener('drop',function(e){e.preventDefault();drop.classList.remove('on');addCsvFiles(e.dataTransfer.files,function(f){return f.name})});
 $('sample').addEventListener('click',loadSample);
-$('q').addEventListener('input',function(e){query=e.target.value;page=0;render()});
+$('folder').addEventListener('click',function(){$('folderpick').click()});
+$('folderpick').addEventListener('change',function(e){
+  var list=Array.prototype.filter.call(e.target.files,function(f){return/\.csv$/i.test(f.name)&&f.name.indexOf('._')!==0}).slice(0,500);
+  e.target.value='';
+  if(!list.length){say('No CSV files were found in that folder.');return}
+  say('');addCsvFiles(list,function(f){return f.webkitRelativePath||f.name});
+});
+if('webkitdirectory' in document.createElement('input'))$('folder').hidden=false;
+$('q').addEventListener('input',function(e){query=e.target.value;page=0;renderTable(all())});
+$('colsbody').addEventListener('toggle',function(e){var d=e.target;if(d&&d.dataset&&d.dataset.fi!==undefined)files[+d.dataset.fi].open=d.open},true);
+$('colsbody').addEventListener('change',function(e){
+  var t=e.target,f=t.dataset&&t.dataset.f!==undefined?files[+t.dataset.f]:null;if(!f)return;
+  if(t.dataset.dmy){f.dmy=t.value==='dmy'}
+  else{var m={},cur=f.mapping||f.csv.mapping,k;for(k in cur)m[k]=cur[k];if(t.value)m[t.dataset.k]=t.value;else delete m[t.dataset.k];f.mapping=m}
+  reparse(f);pending=null;page=0;render();
+});
 document.addEventListener('click',function(e){
-  var b=e.target.closest('button');if(!b)return;
-  if(b.dataset.rm!==undefined){files.splice(+b.dataset.rm,1);page=0;render()}
-  else if(b.dataset.tab){tab=b.dataset.tab;page=0;render()}
-  else if(b.dataset.pg){page+=+b.dataset.pg;render()}
+  var b=e.target.closest('button');if(!b)return;var d=b.dataset;
+  if(d.rm!==undefined){files.splice(+d.rm,1);pending=null;page=0;render()}
+  else if(d.tab){tab=d.tab;page=0;renderTable(all())}
+  else if(d.pg){page+=+d.pg;renderTable(all())}
+  else if(d.more!==undefined){files[+d.more].more=true;files[+d.more].open=true;renderCols()}
+  else if(d.reset!==undefined){var f=files[+d.reset];f.mapping=null;f.dmy=false;reparse(f);pending=null;page=0;render()}
+  else if(d.iv){iview=d.iv;renderIssues()}
+  else if(d.dl||d.w==='dl')downloadIssues();
+  else if(d.w==='go'){var p=pending;pending=null;renderWarn();if(p==='xlsx')doXlsx();else doCsv()}
+  else if(d.w==='back'){pending=null;renderWarn()}
 });
 
 function masterCsv(){return toCsv(raw())}
-$('exp').addEventListener('click',function(){
-  var name='ledgermerger-master-'+new Date().toISOString().slice(0,10)+'.csv',msg=$('msg');
-  try{
-    var url=URL.createObjectURL(new Blob(['\uFEFF'+masterCsv()],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');
-    a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
-    setTimeout(function(){URL.revokeObjectURL(url)},1000);
-    msg.textContent='Saved '+name+' to your downloads.';
-  }catch(e){msg.textContent='Could not create the file. Try a different browser.'}
-});
+function doCsv(){try{save(['\uFEFF'+masterCsv()],'ledgermerger-master-'+today()+'.csv','text/csv;charset=utf-8');say('Saved ledgermerger-master-'+today()+'.csv to your downloads.')}catch(e){say('Could not create the file. Try a different browser.')}}
+function doXlsx(){try{save([toXlsx(sortChron(raw(),'asc'))],'ledgermerger-master-'+today()+'.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');say('Saved ledgermerger-master-'+today()+'.xlsx to your downloads.')}catch(e){say('Could not create the Excel file. Try a different browser.')}}
+function downloadIssues(){try{save(['\uFEFF'+toIssuesCsv(issueItems())],'ledgermerger-skipped-rows-'+today()+'.csv','text/csv;charset=utf-8');say('Saved the skipped-rows list to your downloads.')}catch(e){say('Could not create the file. Try a different browser.')}}
+$('exp').addEventListener('click',function(){if(errCount()>0){pending='csv';renderWarn();return}doCsv()});
+$('xl').addEventListener('click',function(){if(errCount()>0){pending='xlsx';renderWarn();return}doXlsx()});
 var u=['ledgermerger.feedback','gmail.com'].join('@'),mail=$('mail');
 mail.href='mailto:'+u+'?subject='+encodeURIComponent('LedgerMerger feedback')+'&body='+encodeURIComponent("What happened, or what would you like to see?\n\n\nPlatform (PayPal, Venmo, Square or Cash App):\n\nBrowser and device:\n\nPlease don't paste real transaction data, names or account details.\n");
 $('addr').textContent=u;
-$('xl').addEventListener('click',function(){
-  var name='ledgermerger-master-'+new Date().toISOString().slice(0,10)+'.xlsx',msg=$('msg');
-  try{
-    var url=URL.createObjectURL(new Blob([toXlsx(sortChron(raw(),'asc'))],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');
-    a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
-    setTimeout(function(){URL.revokeObjectURL(url)},1000);
-    msg.textContent='Saved '+name+' to your downloads.';
-  }catch(e){msg.textContent='Could not create the Excel file. Try a different browser.'}
-});
 // Paste your donation page address between the quotes (Ko-fi, Buy Me a Coffee, GitHub Sponsors...). While it is empty, the support note stays hidden.
 var DONATE='';
 if(DONATE){$('donate').href=DONATE;$('support').hidden=false}
