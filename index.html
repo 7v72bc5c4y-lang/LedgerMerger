@@ -146,7 +146,7 @@ td{padding:8px 12px;border-top:1px solid var(--line);white-space:nowrap;max-widt
 </section>
 <p class="note" id="msg" role="status"></p>
 <p class="note">No account, cookies, analytics or network requests. Your files are read in this browser tab and never leave your device.</p>
-<section class="support" id="support" hidden><p><b>LedgerMerger is free.</b> If it saved you time, you can help keep it going.</p><a class="fb" id="donate" href="#" target="_blank" rel="noopener noreferrer">Support LedgerMerger</a></section>
+<section class="support" id="support" hidden><p><b>LedgerMerger is free.</b> If it saved you time, you can help keep it going.</p><a class="fb" id="supportlink" href="#" target="_blank" rel="noopener noreferrer">Support LedgerMerger</a></section>
 <div class="foot"><div class="fbr"><a class="fb" href="https://github.com/7v72bc5c4y-lang/LedgerMerger/issues/new?body=%2A%2AWhat%20happened%2C%20or%20what%20would%20you%20like%20to%20see%3F%2A%2A%0A%0A%0A%2A%2APlatform%20%28PayPal%2C%20Venmo%2C%20Square%20or%20Cash%20App%29%3A%2A%2A%0A%0A%2A%2ABrowser%20and%20device%3A%2A%2A%0A%0A_Please%20don%27t%20paste%20real%20transaction%20data%2C%20names%20or%20account%20details._%0A" target="_blank" rel="noopener noreferrer">Report a bug / request a feature</a><a class="fb" id="mail" href="#">Email feedback</a></div><span class="note" style="margin:0">The first button opens GitHub (free account needed). Or email <span id="addr"></span>. Please don’t include real transaction data in your report.</span></div>
 <p class="note" style="text-align:center"><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a><br>PayPal, Venmo, Square and Cash App are trademarks of their owners. LedgerMerger is not affiliated with them.</p>
 </main>
@@ -497,9 +497,9 @@ $('xl').addEventListener('click',function(){if(errCount()>0){pending='xlsx';rend
 var u=['ledgermerger.feedback','gmail.com'].join('@'),mail=$('mail');
 mail.href='mailto:'+u+'?subject='+encodeURIComponent('LedgerMerger feedback')+'&body='+encodeURIComponent("What happened, or what would you like to see?\n\n\nPlatform (PayPal, Venmo, Square or Cash App):\n\nBrowser and device:\n\nPlease don't paste real transaction data, names or account details.\n");
 $('addr').textContent=u;
-// Paste your donation page address between the quotes (Ko-fi, Buy Me a Coffee, GitHub Sponsors...). While it is empty, the support note stays hidden.
-var DONATE='https://ko-fi.com/ledgermerger';
-if(DONATE){$('donate').href=DONATE;$('support').hidden=false}
+// The address of your support page (Ko-fi, Buy Me a Coffee, GitHub Sponsors...). While it is empty, the support note stays hidden.
+var SUPPORT_URL='https://ko-fi.com/ledgermerger';
+if(SUPPORT_URL){$('supportlink').href=SUPPORT_URL;$('support').hidden=false}
 render();
 })();
 </script>
