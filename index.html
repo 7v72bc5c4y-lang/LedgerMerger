@@ -498,7 +498,7 @@ var u=['ledgermerger.feedback','gmail.com'].join('@'),mail=$('mail');
 mail.href='mailto:'+u+'?subject='+encodeURIComponent('LedgerMerger feedback')+'&body='+encodeURIComponent("What happened, or what would you like to see?\n\n\nPlatform (PayPal, Venmo, Square or Cash App):\n\nBrowser and device:\n\nPlease don't paste real transaction data, names or account details.\n");
 $('addr').textContent=u;
 // Paste your donation page address between the quotes (Ko-fi, Buy Me a Coffee, GitHub Sponsors...). While it is empty, the support note stays hidden.
-var DONATE='';
+var DONATE='https://ko-fi.com/ledgermerger';
 if(DONATE){$('donate').href=DONATE;$('support').hidden=false}
 render();
 })();
